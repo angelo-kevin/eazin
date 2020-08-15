@@ -63,32 +63,34 @@ app.get('/task', async function (req, res) {
 app.get('/modules', async function (req, res) {
   const param = req.query
 
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+  });
+  client.connect();
+
+  let query = `SELECT * FROM modul`
+  
   if (param){
-    const client = new Client({
-      connectionString: process.env.DATABASE_URL,
-      ssl: true,
-    });
-    client.connect();
-
-    let query = `SELECT * FROM modul WHERE id = ` + param["id"]
-
-    try {
-      const result = await client.query(query);
-      res.json({
-        success: true,
-        data: result.rows,
-      })
-    } catch(err) {
-      console.log(err);
-      res.json({
-        success: false,
-        error: {
-          message: err.message
-        }
-      });
-    }
-    client.end();
+    query = `SELECT * FROM modul WHERE id = ` + param["id"]
   }
+
+  try {
+    const result = await client.query(query);
+    res.json({
+      success: true,
+      data: result.rows,
+    })
+  } catch(err) {
+    console.log(err);
+    res.json({
+      success: false,
+      error: {
+        message: err.message
+      }
+    });
+  }
+  client.end();
 });
 
 app.put('/task', async function (req, res){
