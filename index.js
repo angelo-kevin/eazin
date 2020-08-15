@@ -71,7 +71,7 @@ app.get('/modules', async function (req, res) {
 
   let query = `SELECT * FROM modul`
   
-  if (param){
+  if (param["id"]){
     query = `SELECT * FROM modul WHERE id = ` + param["id"]
   }
 
