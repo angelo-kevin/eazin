@@ -108,10 +108,10 @@ app.get('/module', async function (req, res) {
   });
   client.connect();
 
-  let query = `SELECT * FROM modul`
+  let query = `SELECT * FROM module`
 
   if (param["id"]){
-    query = `SELECT * FROM modul WHERE id = ` + param["id"]
+    query = `SELECT * FROM module WHERE id = ` + param["id"]
   }
 
   try {
@@ -229,7 +229,7 @@ app.put('/task', async function (req, res){
   }
 })
 
-app.put('/modules', async function (req, res){
+app.put('/module', async function (req, res){
   const param = req.body
 
   if (param){
@@ -242,7 +242,7 @@ app.put('/modules', async function (req, res){
     const key = Object.keys(param)[0]
     const val = param[key]
 
-    const query = `UPDATE modul SET status = ` + val + ` WHERE id = ` + key
+    const query = `UPDATE module SET status = ` + val + ` WHERE id = ` + key
 
     try {
       const result = await client.query(query);
