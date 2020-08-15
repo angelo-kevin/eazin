@@ -70,9 +70,42 @@ app.get('/modules', async function (req, res) {
   client.connect();
 
   let query = `SELECT * FROM modul`
-  
+
   if (param["id"]){
     query = `SELECT * FROM modul WHERE id = ` + param["id"]
+  }
+
+  try {
+    const result = await client.query(query);
+    res.json({
+      success: true,
+      data: result.rows,
+    })
+  } catch(err) {
+    console.log(err);
+    res.json({
+      success: false,
+      error: {
+        message: err.message
+      }
+    });
+  }
+  client.end();
+});
+
+app.get('/news', async function (req, res) {
+  const param = req.query
+
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+  });
+  client.connect();
+
+  let query = `SELECT * FROM news`
+
+  if (param["id"]){
+    query = `SELECT * FROM news WHERE id = ` + param["id"]
   }
 
   try {
@@ -106,7 +139,7 @@ app.put('/task', async function (req, res){
     const key = Object.keys(param)[0]
     const val = param[key]
 
-    const query = `UPDATE review_sekolah SET ` + key + ` = ` + val
+    const query = `UPDATE task SET status = ` + val + ` WHERE id = ` + key
 
     try {
       const result = await client.query(query);
@@ -126,7 +159,7 @@ app.put('/task', async function (req, res){
   }
 })
 
-app.post('/review', async function (req, res){
+app.put('/modules', async function (req, res){
   const param = req.body
 
   if (param){
@@ -136,35 +169,10 @@ app.post('/review', async function (req, res){
     });
     client.connect();
 
-    const col = []
-    const values = []
-    let sum = 0
-    let count = 0
+    const key = Object.keys(param)[0]
+    const val = param[key]
 
-    Object.keys(param).forEach(function(key){
-      let val = param[key]
-
-      if (key == "npsn" || key == "komentar" || key == "user_id"){}
-      else{
-        val = parseInt(val)
-        sum += val
-        count++
-      }
-      col.push(key)
-      if (key == "komentar"){
-        values.push("E" + SqlString.escape(val))
-      } else{
-        values.push(SqlString.escape(val))
-      }
-    })
-
-    const time = new Date()
-    const nilai = sum/count
-    col.push("tanggal", "nilai_rata", "likes", "dislikes")
-    values.push(SqlString.escape(time), nilai, 0, 0)
-
-    const query = `INSERT INTO review_sekolah(` + col.join(", ") + `)
-      VALUES (` + values.join(", ") + `)`
+    const query = `UPDATE modul SET status = ` + val + ` WHERE id = ` + key
 
     try {
       const result = await client.query(query);
