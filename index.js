@@ -60,9 +60,68 @@ app.get('/task', async function (req, res) {
   client.end();
 });
 
+app.get('/modules', async function (req, res) {
+  const param = req.query
+
+  if (param){
+    const client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: true,
+    });
+    client.connect();
+
+    let query = `SELECT * FROM modul WHERE id = ` + param["id"]
+
+    try {
+      const result = await client.query(query);
+      res.json({
+        success: true,
+        data: result.rows,
+      })
+    } catch(err) {
+      console.log(err);
+      res.json({
+        success: false,
+        error: {
+          message: err.message
+        }
+      });
+    }
+    client.end();
+  }
+});
+
 app.put('/task', async function (req, res){
   const param = req.body
-  print(param)
+
+  if (param){
+    const client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: true,
+    });
+    client.connect();
+
+    const key = Object.keys(param)[0]
+    const val = param[key]
+
+    const query = `UPDATE review_sekolah SET ` + key + ` = ` + val
+
+    try {
+      const result = await client.query(query);
+      res.json({
+        success: true
+      })
+    } catch(err) {
+      console.log(err);
+      res.json({
+        success: false,
+        error: {
+          message: err.message
+        }
+      });
+    }
+    client.end();
+  }
 })
 
 app.post('/review', async function (req, res){
