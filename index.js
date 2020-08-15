@@ -2,35 +2,28 @@
 require('dotenv').config();
 
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const cp = require('child_process');
-const ngrok = require('ngrok');
-const cors = require('cors')
-let SqlString = require('sqlstring')
+const cors = require('cors');
+let SqlString = require('sqlstring');
 const {Client} = require('pg');
-
-// base URL for webhook server
-let baseURL = process.env.BASE_URL;
 
 // create Express app
 // about Express itself: https://expressjs.com/
 const app = express();
 
 // use body parser for POST operations
-app.use(express.json())
+app.use(express.json());
 app.use(express.urlencoded({
   extended: true
-}))
+}));
 
 // cors
-app.use(cors())
+app.use(cors());
 
 // serve static and downloaded files
 app.use('/static', express.static('static'));
 app.use('/downloaded', express.static('downloaded'));
 
-app.get('/', (req, res) => res.end(`Listening...`));
+app.get('/', (_, res) => res.end(`Listening...`));
 
 // webhook callback
 app.post('/profile', async function (req, res){
@@ -265,9 +258,5 @@ app.put('/module', async function (req, res){
 // listen on port
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  if (baseURL) {
-    console.log(`listening on ${baseURL}:${port}`);
-  } else {
-    console.log(`listening on localhost:${port}`);
-  }
+  console.log(`Listening on port ${port}`);
 });
