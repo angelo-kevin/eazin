@@ -60,6 +60,11 @@ app.get('/task', async function (req, res) {
   client.end();
 });
 
+app.put('/task', async function (req, res){
+  const param = req.body
+  print(param)
+})
+
 app.post('/review', async function (req, res){
   const param = req.body
 
