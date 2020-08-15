@@ -33,6 +33,45 @@ app.use('/downloaded', express.static('downloaded'));
 app.get('/', (req, res) => res.end(`Listening...`));
 
 // webhook callback
+app.post('/profile', async function (req, res){
+  const param = req.body
+
+  if (param){
+    const client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: true,
+    });
+    client.connect();
+
+    const col = []
+    const values = []
+
+    Object.keys(param).forEach(function(key){
+      col.push(key)
+      values.push(SqlString.escape(param[key]))
+    })
+
+    const query = `INSERT INTO profile (` + col.join(", ") + `)
+      VALUES (` + values.join(", ") + `)`
+
+    try {
+      const result = await client.query(query);
+      res.json({
+        success: true
+      })
+    } catch(err) {
+      console.log(err);
+      res.json({
+        success: false,
+        error: {
+          message: err.message
+        }
+      });
+    }
+    client.end();
+  }
+})
+
 app.get('/task', async function (req, res) {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -60,7 +99,7 @@ app.get('/task', async function (req, res) {
   client.end();
 });
 
-app.get('/modules', async function (req, res) {
+app.get('/module', async function (req, res) {
   const param = req.query
 
   const client = new Client({
@@ -124,6 +163,37 @@ app.get('/news', async function (req, res) {
     });
   }
   client.end();
+});
+
+app.get('/profile', async function (req, res) {
+  const param = req.query
+
+  if (param){
+    const client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: true,
+    });
+    client.connect();
+
+    query = `SELECT * FROM profile WHERE id = ` + param["id"]
+
+    try {
+      const result = await client.query(query);
+      res.json({
+        success: true,
+        data: result.rows,
+      })
+    } catch(err) {
+      console.log(err);
+      res.json({
+        success: false,
+        error: {
+          message: err.message
+        }
+      });
+    }
+    client.end();
+  }
 });
 
 app.put('/task', async function (req, res){
